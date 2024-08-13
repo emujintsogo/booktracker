@@ -27,18 +27,14 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 export default function Home() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
-  const userSession = sessionStorage.getItem("user");
 
   useEffect(() => {
-    if (!loading) {
-      if (!user && !userSession) {
-        router.push("/sign-in");
-      } else if (user) {
-        sessionStorage.setItem("user", user.uid);
-        updateInventory();
-      }
+    if (!loading && !user) {
+      router.push("/sign-in");
+    } else if (user) {
+      updateInventory();
     }
-  }, [user, userSession, loading, router]);
+  }, [user, loading, router]);
 
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
@@ -62,7 +58,7 @@ export default function Home() {
 
   const addItem = async (item) => {
     if (!user) return;
-    if (item == "") return;
+    if (item === "") return;
     const userDocRef = doc(firestore, `users/${user.uid}`);
     const inventoryCollectionRef = collection(userDocRef, "inventory");
     const itemDocRef = doc(inventoryCollectionRef, itemName);
@@ -110,8 +106,7 @@ export default function Home() {
             color="inherit"
             onClick={() => {
               signOut(auth);
-              sessionStorage.removeItem("user");
-              router.push("/signin");
+              router.push("/sign-in");
             }}
           >
             Log out
